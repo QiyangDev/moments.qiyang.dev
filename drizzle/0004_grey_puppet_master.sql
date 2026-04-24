@@ -1,0 +1,1 @@
+ALTER TABLE "moments" ALTER COLUMN "is_published" SET DEFAULT true;
