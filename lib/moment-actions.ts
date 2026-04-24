@@ -47,7 +47,7 @@ export async function createMomentAction(
   _state: MomentFormState,
   formData: FormData,
 ): Promise<MomentFormState> {
-  await requireSession();
+  const session = await requireSession();
 
   const parsed = parseMomentFormData(formData);
 
@@ -55,7 +55,10 @@ export async function createMomentAction(
     return { error: parsed.error };
   }
 
-  await createMoment(parsed.data);
+  await createMoment({
+    ...parsed.data,
+    authorId: session.user.id,
+  });
   revalidatePath("/");
   redirect("/");
 }
@@ -85,13 +88,21 @@ export async function updateMomentAction(
 }
 
 export async function deleteMomentAction(id: string) {
-  await requireSession();
-  await deleteMoment(id);
+  const session = await requireSession();
+  await deleteMoment(id, session.user.id);
   revalidatePath("/");
 }
 
-export async function likeMomentAction(id: string) {
-  const moment = await incrementMomentLikeCount(id);
+export async function likeMomentAction(id: string, amount = 1) {
+  const likeAmount = Math.trunc(amount);
+
+  if (!Number.isSafeInteger(likeAmount) || likeAmount < 1) {
+    return {
+      error: "Unable to save your like right now.",
+    } as const;
+  }
+
+  const moment = await incrementMomentLikeCount(id, likeAmount);
 
   if (!moment) {
     return {

@@ -10,10 +10,17 @@ export type MomentInput = {
   isPublished: boolean;
 };
 
+export type CreateMomentInput = MomentInput & {
+  authorId: string;
+};
+
 export async function listPublishedMoments() {
   return db.query.moments.findMany({
     where: eq(moments.isPublished, true),
     orderBy: desc(moments.publishedAt),
+    with: {
+      author: true,
+    },
   });
 }
 
@@ -29,7 +36,7 @@ export async function getMomentById(id: string) {
   });
 }
 
-export async function createMoment(input: MomentInput) {
+export async function createMoment(input: CreateMomentInput) {
   const [moment] = await db
     .insert(moments)
     .values({
@@ -51,20 +58,20 @@ export async function updateMoment(id: string, input: MomentInput) {
   return moment;
 }
 
-export async function deleteMoment(id: string) {
+export async function deleteMoment(id: string, authorId: string) {
   const [moment] = await db
     .delete(moments)
-    .where(eq(moments.id, id))
+    .where(and(eq(moments.id, id), eq(moments.authorId, authorId)))
     .returning({ id: moments.id });
 
   return moment;
 }
 
-export async function incrementMomentLikeCount(id: string) {
+export async function incrementMomentLikeCount(id: string, amount = 1) {
   const [moment] = await db
     .update(moments)
     .set({
-      likeCount: sql`${moments.likeCount} + 1`,
+      likeCount: sql`${moments.likeCount} + ${amount}`,
     })
     .where(and(eq(moments.id, id), eq(moments.isPublished, true)))
     .returning({ likeCount: moments.likeCount });

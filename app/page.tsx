@@ -1,11 +1,10 @@
-import Link from "next/link";
-import { LogIn, PlusSquare } from "lucide-react";
+import { PlusSquare } from "lucide-react";
 
 import { ModeToggle } from "@/components/mode-toggle";
+import { AuthDialog } from "@/components/auth/auth-dialog";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { HomeMomentComposer } from "@/components/moment/home-moment-composer";
 import { PublicMomentTimeline } from "@/components/moment/public-moment-timeline";
-import { Button } from "@/components/ui/button";
 import { createMomentAction } from "@/lib/moment-actions";
 import { listPublishedMoments } from "@/lib/moments";
 import { getSession } from "@/lib/session";
@@ -17,7 +16,7 @@ export default async function Home() {
   const moments = await listPublishedMoments();
 
   return (
-    <main className="min-h-screen px-6 py-16">
+    <main className="min-h-screen px-6 py-16 max-w-2xl mx-auto">
       <section className="mx-auto flex max-w-5xl flex-col gap-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-col gap-1">
@@ -33,14 +32,7 @@ export default async function Home() {
             {session ? (
               <SignOutButton />
             ) : (
-              <Button
-                nativeButton={false}
-                render={<Link href="/sign-in?next=/" />}
-                variant="outline"
-              >
-                <LogIn />
-                Sign in
-              </Button>
+              <AuthDialog />
             )}
             <ModeToggle />
           </div>
@@ -58,7 +50,10 @@ export default async function Home() {
         )}
 
         <div className="flex flex-col gap-4">
-          <PublicMomentTimeline moments={moments} />
+          <PublicMomentTimeline
+            currentUserId={session?.user.id}
+            moments={moments}
+          />
         </div>
       </section>
     </main>

@@ -1,25 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
-type AuthMode = "sign-in" | "sign-up";
+export type AuthMode = "sign-in" | "sign-up";
 
 type AuthFormProps = {
   mode: AuthMode;
+  onModeChange?: (mode: AuthMode) => void;
   redirectTo: string;
 };
 
@@ -45,17 +39,20 @@ function getErrorMessage(error: AuthError | null | undefined) {
   }
 }
 
-export function AuthForm({ mode, redirectTo }: AuthFormProps) {
+export function AuthForm({ mode, onModeChange, redirectTo }: AuthFormProps) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isSignUp = mode === "sign-up";
 
-  async function handleSubmit(formData: FormData) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
     setIsPending(true);
     setErrorMessage(null);
 
+    const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") ?? "");
     const password = String(formData.get("password") ?? "");
     const name = String(formData.get("name") ?? "");
@@ -71,9 +68,8 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
           password,
         });
 
-    setIsPending(false);
-
     if (response.error) {
+      setIsPending(false);
       setErrorMessage(getErrorMessage(response.error));
       return;
     }
@@ -85,88 +81,78 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-6 py-16">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{isSignUp ? "Create your account" : "Welcome back"}</CardTitle>
-          <CardDescription>
-            {isSignUp
-              ? "Sign up with your name, email, and password."
-              : "Sign in with the email and password you registered with."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form action={handleSubmit} className="flex flex-col gap-5">
-            {isSignUp ? (
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  autoComplete="name"
-                  id="name"
-                  name="name"
-                  placeholder="Ada Lovelace"
-                  required
-                />
-              </div>
-            ) : null}
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      {isSignUp ? (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="name">Name</Label>
+          <Input
+            autoComplete="name"
+            id="name"
+            name="name"
+            placeholder="Ada Lovelace"
+            required
+          />
+        </div>
+      ) : null}
 
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                autoComplete="email"
-                id="email"
-                name="email"
-                placeholder="you@example.com"
-                required
-                type="email"
-              />
-            </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          autoComplete="email"
+          id="email"
+          name="email"
+          placeholder="you@example.com"
+          required
+          type="email"
+        />
+      </div>
 
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                autoComplete={isSignUp ? "new-password" : "current-password"}
-                id="password"
-                minLength={8}
-                name="password"
-                placeholder="At least 8 characters"
-                required
-                type="password"
-              />
-            </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          autoComplete={isSignUp ? "new-password" : "current-password"}
+          id="password"
+          minLength={8}
+          name="password"
+          placeholder="At least 8 characters"
+          required
+          type="password"
+        />
+      </div>
 
-            {errorMessage ? (
-              <p className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {errorMessage}
-              </p>
-            ) : null}
+      {errorMessage ? (
+        <p className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {errorMessage}
+        </p>
+      ) : null}
 
-            <Button disabled={isPending} type="submit">
-              {isPending
-                ? isSignUp
-                  ? "Creating account..."
-                  : "Signing in..."
-                : isSignUp
-                  ? "Create account"
-                  : "Sign in"}
-            </Button>
+      <Button aria-busy={isPending} disabled={isPending} type="submit">
+        {isPending ? <Spinner /> : null}
+        {isPending
+          ? isSignUp
+            ? "Creating account..."
+            : "Signing in..."
+          : isSignUp
+            ? "Create account"
+            : "Sign in"}
+      </Button>
 
-            <p className="text-sm text-muted-foreground">
-              {isSignUp ? "Already have an account?" : "Need an account?"}{" "}
-              <Link
-                className="font-medium text-foreground underline-offset-4 hover:underline"
-                href={
-                  isSignUp
-                    ? `/sign-in?next=${encodeURIComponent(redirectTo)}`
-                    : `/sign-up?next=${encodeURIComponent(redirectTo)}`
-                }
-              >
-                {isSignUp ? "Sign in" : "Create one"}
-              </Link>
-            </p>
-          </form>
-        </CardContent>
-      </Card>
-    </main>
+      {onModeChange ? (
+        <p className="text-sm text-muted-foreground">
+          {isSignUp ? "Already have an account?" : "Need an account?"}{" "}
+          <Button
+            className="h-auto px-0"
+            onClick={() => {
+              setErrorMessage(null);
+              onModeChange(isSignUp ? "sign-in" : "sign-up");
+            }}
+            type="button"
+            variant="link"
+          >
+            {isSignUp ? "Sign in" : "Create one"}
+          </Button>
+        </p>
+      ) : null}
+    </form>
   );
 }

@@ -5,8 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Moments Auth",
-  description: "Better Auth, Drizzle, and Supabase on Next.js 16.",
+  title: "Moments",
+  description: "Qiyang's moments.",
 };
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
-      <body className="min-h-full flex flex-col max-w-2xl mx-auto">
+      <body className="min-h-full flex flex-col mx-auto">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
