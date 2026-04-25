@@ -90,7 +90,7 @@ function EditorToolbar({ toolbarEnd }: { toolbarEnd?: React.ReactNode }) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-1 border-b bg-muted/50 px-3 py-2">
+    <div className="flex min-w-0 flex-wrap items-center gap-1 border-b bg-muted/50 px-3 py-2">
       <ToolbarButton
         disabled={!editor.can().chain().focus().undo().run()}
         label="Undo"
@@ -194,7 +194,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "tiptap min-h-56 px-4 py-3 focus:outline-none",
+          "tiptap min-h-56 w-full min-w-0 px-4 py-3 focus:outline-none",
       },
     },
     onUpdate: ({ editor: currentEditor }) => {
@@ -203,7 +203,7 @@ export function RichTextEditor({
   });
 
   return (
-    <div className="overflow-hidden rounded-xl border bg-background">
+    <div className="w-full min-w-0 overflow-hidden rounded-xl border bg-background">
       <input name={name} type="hidden" value={html} />
       <input
         aria-hidden="true"

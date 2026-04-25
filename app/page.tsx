@@ -16,8 +16,8 @@ export default async function Home() {
   const moments = await listPublishedMoments();
 
   return (
-    <main className="min-h-screen px-6 py-16 max-w-2xl mx-auto">
-      <section className="mx-auto flex max-w-5xl flex-col gap-10">
+    <main className="mx-auto min-h-screen w-full max-w-2xl px-6 py-16">
+      <section className="mx-auto flex w-full max-w-5xl min-w-0 flex-col gap-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-semibold tracking-tight">Moments</h1>

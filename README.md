@@ -1,5 +1,7 @@
 # Moments
 
+![Homepage screenshot](docs/images/homepage.png)
+
 A minimal public writing timeline built with `Next.js 16`, `Better Auth`, `Drizzle`, `Supabase Postgres`, `shadcn/ui`, and `Tiptap`.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FQiyangDev%2Fmoments.qiyang.dev.git&project-name=moments-qiyang-dev&repository-name=moments.qiyang.dev&env=BETTER_AUTH_SECRET,BETTER_AUTH_URL&envDescription=Better%20Auth%20settings.%20Use%20the%20Vercel%20Supabase%20integration%20for%20Postgres%2C%20or%20manually%20add%20DATABASE_URL.&envLink=https%3A%2F%2Fgithub.com%2FQiyangDev%2Fmoments.qiyang.dev%23environment-variables)

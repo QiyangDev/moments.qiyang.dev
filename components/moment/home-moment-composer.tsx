@@ -37,7 +37,7 @@ export function HomeMomentComposer({ action }: HomeMomentComposerProps) {
   const [state, formAction] = useActionState(action, initialState);
 
   return (
-    <form action={formAction} className="flex flex-col gap-3">
+    <form action={formAction} className="flex w-full min-w-0 flex-col gap-3">
       <RichTextEditor
         id="content"
         name="content"
